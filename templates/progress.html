@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar span {
+            display: block;
+            height: 25px;
+            background-color: #4caf50;
+            width: 0;
+            text-align: center;
+            line-height: 25px;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Processing Your File...</h1>
+        <div class="progress-bar">
+            <span id="progress-bar-span">0%</span>
+        </div>
+        <p>Please wait while we process your file. This might take a few moments.</p>
+        <script>
+            function updateProgress() {
+                fetch('/progress')
+                    .then(response => response.text())
+                    .then(data => {
+                        const progress = parseInt(data);
+                        const progressBar = document.getElementById('progress-bar-span');
+                        progressBar.style.width = progress + '%';
+                        progressBar.textContent = progress + '%';
+
+                        if (progress < 100) {
+                            setTimeout(updateProgress, 1000);
+                        } else {
+                            setTimeout(() => {
+                                window.location.href = '/result.html';
+                            }, 1000);
+                        }
+                    });
+            }
+            updateProgress();
+        </script>
+    </div>
+</body>
+</html>

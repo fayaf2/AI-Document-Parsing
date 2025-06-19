@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload DOCX File</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 900px;
+            display: flex;
+        }
+        .left {
+            background-color: #f9f9f9;
+            padding: 40px;
+            text-align: center;
+        }
+        .left img {
+            max-width: 100%;
+            height: auto;
+        }
+        .left h1 {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+        .left p {
+            font-size: 14px;
+            color: #666;
+        }
+        .right {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 400px;
+        }
+        .right h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .right button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .right button:hover {
+            background-color: #0056b3;
+        }
+        .right input[type="file"] {
+            margin-bottom: 20px;
+        }
+        /* Loading Spinner Styles */
+        #loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        #spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .progress {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+            margin-top: 20px;
+            position: relative;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #007bff;
+            width: 0;
+            border-radius: 4px;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="left">
+            <img src="{{ url_for('static', filename='threatsview-logo.png') }}" alt="ThreatsView Logo">
+            <h1>Empower your Security Team with ThreatsView</h1>
+            <p>Streamline your vulnerability tracking and prioritization processes effortlessly with our intuitive platform</p>
+        </div>
+        <div class="right">
+            <h2>Upload DOC File</h2>
+            <form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".doc, .docx" required><br>
+                <button type="submit">Upload File</button>
+            </form>
+            <div class="progress" id="progress">
+                <div class="progress-bar" id="progress-bar">0%</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function() {
+            document.getElementById('loading-spinner').style.display = 'flex';
+        });
+
+        function updateProgress() {
+            fetch('/progress')
+                .then(response => response.json())
+                .then(data => {
+                    const progress = data.progress;
+                    const progressBar = document.getElementById('progress-bar');
+                    progressBar.style.width = progress + '%';
+                    progressBar.textContent = progress + '%';
+                    if (progress < 100) {
+                        setTimeout(updateProgress, 1000); // Poll every second
+                    }
+                });
+        }
+
+        // Start polling for progress when the page loads
+        updateProgress();
+    </script>
+</body>
+</html>
